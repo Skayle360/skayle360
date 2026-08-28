@@ -1,0 +1,5 @@
+# chat.skayle360.com serves the assistant API and its widget.
+# Nothing here should appear in search results — the widget is meant to be
+# embedded on skayle360.com, not found on its own.
+User-agent: *
+Disallow: /

@@ -1,0 +1,51 @@
+{
+  "name": "skayle360-chatbot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ingest": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs ingest/run.ts",
+    "ingest:crawl": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs ingest/crawl.ts",
+    "typecheck": "tsc --noEmit",
+    "ingest:load": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs ingest/load.ts",
+    "build:widget": "node build-widget.mjs",
+    "dev": "next dev",
+    "build": "node build-widget.mjs && next build",
+    "start": "next start",
+    "test": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs tests/grounding.test.ts && node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs tests/cors.test.ts && node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs tests/tools.test.ts && node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs ingest/probe/pg-retrieval-test.ts",
+    "test:cache": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs tests/cache.test.ts",
+    "db:setup": "bash scripts/db-setup.sh",
+    "ask": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/ask.ts",
+    "sheets:backfill": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/sheets-backfill.ts",
+    "reset:testdata": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/reset-test-data.ts",
+    "e2e": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/e2e.ts",
+    "search": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/search.ts",
+    "audit": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/audit.ts",
+    "embed": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/embed.ts",
+    "audit:compare": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/audit-compare.ts",
+    "dev:mirror": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/make-mirror.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.121.0",
+    "cheerio": "^1.0.0",
+    "fflate": "^0.8.2",
+    "googleapis": "^176.0.0",
+    "next": "^15.5.24",
+    "pg": "^8.23.0",
+    "preact": "^10.29.8",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "resend": "^6.24.0",
+    "unpdf": "^1.8.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

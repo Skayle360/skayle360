@@ -1,0 +1,18 @@
+import { isAllowedOrigin } from "../src/lib/cors";
+let bad = 0;
+const t = (origin: string | null, want: boolean, note: string) => {
+  const got = isAllowedOrigin(origin);
+  if (got !== want) { bad++; console.log(`FAIL  ${origin} -> ${got}, wanted ${want} (${note})`); }
+  else console.log(`PASS  ${String(origin).padEnd(34)} ${got ? "allowed" : "blocked"}  ${note}`);
+};
+t("https://skayle360.com", true, "the client's site");
+t("https://skayle360.webflow.io", true, "staging");
+t("http://localhost:3000", true, "dev, any port");
+t("http://localhost:3111", true, "dev, any port");
+t("http://127.0.0.1:8080", true, "dev");
+t("https://evil-skayle360.com", false, "lookalike domain");
+t("https://skayle360.com.attacker.net", false, "suffix attack");
+t("http://localhost.evil.com", false, "localhost lookalike");
+t(null, false, "no origin header");
+console.log(bad ? `\n${bad} FAILED` : "\nCORS boundary holds");
+process.exit(bad ? 1 : 0);

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Embed test — SCALE UP assistant</title>
+    <style>
+      /* Deliberately aggressive global selectors, the way a Webflow theme
+         writes them. If the widget still looks right, the iframe is doing
+         its job. */
+      * { box-sizing: content-box; }
+      body { margin: 0; font-family: Georgia, serif; background: #faf8f5; color: #201e1b; }
+      button, input { font-size: 28px !important; border: 4px dashed red !important; background: lime !important; }
+      main { max-width: 46rem; margin: 0 auto; padding: 4rem 1.5rem; line-height: 1.7; }
+      h1 { font-size: 2rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Embed test page</h1>
+      <p>
+        This page applies hostile global CSS to every <code>button</code> and
+        <code>input</code>. The launcher in the bottom-right should be unaffected,
+        because the widget renders inside an iframe with its own document.
+      </p>
+      <p>Try: <em>"we're a nonprofit with 40 employees in Rhode Island, do we qualify?"</em></p>
+      <p><button>A page button, for comparison</button></p>
+    </main>
+    <script src="/widget.js" defer></script>
+  </body>
+</html>
