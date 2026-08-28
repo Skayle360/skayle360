@@ -1,4 +1,4 @@
-import { isAllowedOrigin, corsHeaders } from "../src/lib/cors";
+import { isAllowedOrigin, corsHeaders } from "@/lib/cors";
 let bad = 0;
 const t2 = (got: boolean, want: boolean, note: string) => {
   if (got !== want) { bad++; console.log(`FAIL  ${note} -> ${got}, wanted ${want}`); }

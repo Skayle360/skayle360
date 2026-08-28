@@ -1,5 +1,5 @@
-import { extract } from "./extract";
-import { moduleOf } from "../../config/sources";
+import { extract } from "@ingest/lib/extract";
+import { moduleOf } from "@config/sources";
 
 export interface CatalogEntry {
   name: string;

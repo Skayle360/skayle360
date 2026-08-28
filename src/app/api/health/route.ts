@@ -1,5 +1,5 @@
-import { db } from "../../../lib/db";
-import { getEmbedder } from "../../../lib/embeddings";
+import { db } from "@/lib/db";
+import { getEmbedder } from "@/lib/embeddings";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

@@ -9,7 +9,7 @@
  */
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { crawlSite, CRAWL_PATHS } from "./lib/crawl-core";
+import { crawlSite, CRAWL_PATHS } from "@ingest/lib/crawl-core";
 
 const OUT_DIR = process.env.OUT_DIR ?? new URL("../data", import.meta.url).pathname;
 

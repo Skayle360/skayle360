@@ -1,5 +1,5 @@
-import { db } from "./db";
-import { refreshStats } from "./corpus-stats";
+import { db } from "@/lib/db";
+import { refreshStats } from "@/lib/corpus-stats";
 
 /**
  * Documents taken out of the knowledge base through the admin page.

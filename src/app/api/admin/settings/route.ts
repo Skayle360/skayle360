@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { isAuthenticated } from "../../../../lib/admin-auth";
-import { EDITABLE, loadSettings, saveSetting, resetSetting, type SettingKey } from "../../../../lib/settings";
+import { isAuthenticated } from "@/lib/admin-auth";
+import { EDITABLE, loadSettings, saveSetting, resetSetting, type SettingKey } from "@/lib/settings";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

@@ -1,5 +1,5 @@
-import { retrieve } from "../../src/lib/retrieval";
-import { db } from "../../src/lib/db";
+import { retrieve } from "@/lib/retrieval";
+import { db } from "@/lib/db";
 
 const ANSWERABLE = [
   "we're a nonprofit with 40 employees in Rhode Island - do we qualify?",

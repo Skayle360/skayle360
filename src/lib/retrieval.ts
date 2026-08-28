@@ -1,6 +1,6 @@
-import { db } from "./db";
-import { getEmbedder, toVectorLiteral } from "./embeddings";
-import { RETRIEVAL, SOURCE_WEIGHTS, PROGRAM_DOC_IDS, PROGRAM_DOC_BOOST } from "../../config/app";
+import { db } from "@/lib/db";
+import { getEmbedder, toVectorLiteral } from "@/lib/embeddings";
+import { RETRIEVAL, SOURCE_WEIGHTS, PROGRAM_DOC_IDS, PROGRAM_DOC_BOOST } from "@config/app";
 
 export interface RetrievedChunk {
   id: string;

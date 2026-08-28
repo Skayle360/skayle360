@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { syncWebsite } from "../../../../lib/website-sync";
+import { syncWebsite } from "@/lib/website-sync";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

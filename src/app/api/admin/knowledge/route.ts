@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { isAuthenticated } from "../../../../lib/admin-auth";
-import { loadKnowledge, saveKnowledge } from "../../../../lib/knowledge-store";
+import { isAuthenticated } from "@/lib/admin-auth";
+import { loadKnowledge, saveKnowledge } from "@/lib/knowledge-store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

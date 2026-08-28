@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { Bm25Index } from "../../src/lib/bm25";
+import { Bm25Index } from "@/lib/bm25";
 
 interface Chunk { id: string; docId: string; text: string; locator: string | null; heading: string | null }
 const chunks: Chunk[] = readFileSync("data/corpus.jsonl", "utf-8").trim().split("\n").map((l) => JSON.parse(l));

@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import type { sheets_v4 } from "googleapis";
-import type { Escalation, Lead, LeadSink } from "./lead-sink";
+import type { Escalation, Lead, LeadSink } from "@/lib/sinks/lead-sink";
 
 /**
  * Mirrors leads into Chris's Google Sheet. Confirmed as the destination by the

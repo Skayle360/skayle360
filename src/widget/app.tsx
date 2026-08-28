@@ -1,7 +1,7 @@
 /** @jsxImportSource preact */
 import { render } from "preact";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
-import { THEME } from "../../config/theme";
+import { THEME } from "@config/theme";
 
 interface Source {
   label: string;

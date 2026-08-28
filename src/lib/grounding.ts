@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import type { RetrievedChunk } from "./retrieval";
+import type { RetrievedChunk } from "@/lib/retrieval";
 
 /**
  * Grounding is enforced mechanically here, not by asking the prompt nicely.

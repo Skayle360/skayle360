@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL } from "../../config/app";
+import { CONTACT_EMAIL } from "@config/app";
 
 /**
  * ============================================================================

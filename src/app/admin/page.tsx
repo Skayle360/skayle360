@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import "./admin.css";
+import "@/app/admin/admin.css";
 
 interface Upload {
   id: string; filename: string; size_bytes: number; status: string; error: string | null;

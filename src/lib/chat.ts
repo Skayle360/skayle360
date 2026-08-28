@@ -1,12 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { MODEL } from "../../config/app";
-import { buildSystemPrompt } from "./prompt";
-import { loadSettings } from "./settings";
-import { TOOL_DEFINITIONS, runTool, type ToolContext } from "./tools";
-import { retrieve, isThin, type RetrievedChunk } from "./retrieval";
-import { enforceGrounding, shouldShowBlock, detectCohortConflict, type SourceRef } from "./grounding";
-import { leadSink, type Escalation } from "./sinks/index";
-import { sendEscalation } from "./email";
+import { MODEL } from "@config/app";
+import { buildSystemPrompt } from "@/lib/prompt";
+import { loadSettings } from "@/lib/settings";
+import { TOOL_DEFINITIONS, runTool, type ToolContext } from "@/lib/tools";
+import { retrieve, isThin, type RetrievedChunk } from "@/lib/retrieval";
+import { enforceGrounding, shouldShowBlock, detectCohortConflict, type SourceRef } from "@/lib/grounding";
+import { leadSink, type Escalation } from "@/lib/sinks";
+import { sendEscalation } from "@/lib/email";
 
 let anthropic: Anthropic | null = null;
 const client = (): Anthropic => (anthropic ??= new Anthropic());

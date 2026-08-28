@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
-import { isAuthenticated } from "../../../../lib/admin-auth";
-import { listVersions, getVersion } from "../../../../lib/versions";
-import { EDITABLE, saveSetting, type SettingKey } from "../../../../lib/settings";
-import { KNOWLEDGE_KEY, saveKnowledge } from "../../../../lib/knowledge-store";
+import { isAuthenticated } from "@/lib/admin-auth";
+import { listVersions, getVersion } from "@/lib/versions";
+import { EDITABLE, saveSetting, type SettingKey } from "@/lib/settings";
+import { KNOWLEDGE_KEY, saveKnowledge } from "@/lib/knowledge-store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

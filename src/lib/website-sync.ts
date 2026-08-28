@@ -1,9 +1,9 @@
-import { db } from "./db";
-import { getEmbedder, toVectorLiteral } from "./embeddings";
-import { chunkDocument } from "../../ingest/lib/chunk";
-import { findCohortMentions, auditCohorts } from "../../ingest/lib/cohort";
-import { crawlSite, type CrawledPage } from "../../ingest/lib/crawl-core";
-import { fetchKnowledgeDoc } from "./knowledge-doc";
+import { db } from "@/lib/db";
+import { getEmbedder, toVectorLiteral } from "@/lib/embeddings";
+import { chunkDocument } from "@ingest/lib/chunk";
+import { findCohortMentions, auditCohorts } from "@ingest/lib/cohort";
+import { crawlSite, type CrawledPage } from "@ingest/lib/crawl-core";
+import { fetchKnowledgeDoc } from "@/lib/knowledge-doc";
 import { createHash } from "node:crypto";
 
 /**

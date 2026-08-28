@@ -7,8 +7,8 @@
  *   npm run search -- "express grant eligibility"
  *   npm run search -- "refund"          # nothing found = the bot cannot answer it
  */
-import { retrieve } from "../src/lib/retrieval";
-import { db } from "../src/lib/db";
+import { retrieve } from "@/lib/retrieval";
+import { db } from "@/lib/db";
 
 const query = process.argv.slice(2).join(" ").trim();
 if (!query) {

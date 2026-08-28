@@ -9,9 +9,9 @@
  *   ANTHROPIC_API_KEY=... DATABASE_URL=... npx tsx tests/cache.test.ts
  */
 import Anthropic from "@anthropic-ai/sdk";
-import { MODEL } from "../config/app";
-import { SYSTEM_PROMPT } from "../src/lib/prompt";
-import { TOOL_DEFINITIONS } from "../src/lib/tools";
+import { MODEL } from "@config/app";
+import { SYSTEM_PROMPT } from "@/lib/prompt";
+import { TOOL_DEFINITIONS } from "@/lib/tools";
 
 if (!process.env.ANTHROPIC_API_KEY) {
   console.error("SKIP: ANTHROPIC_API_KEY is not set — cannot verify caching without a live call.");

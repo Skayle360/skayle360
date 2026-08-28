@@ -1,5 +1,5 @@
-import { db } from "../db";
-import type { Escalation, Lead, LeadSink } from "./lead-sink";
+import { db } from "@/lib/db";
+import type { Escalation, Lead, LeadSink } from "@/lib/sinks/lead-sink";
 
 /** The source of truth. Every other destination is a mirror of this table. */
 export class PostgresLeadSink implements LeadSink {

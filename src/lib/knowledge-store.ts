@@ -1,9 +1,9 @@
-import { db } from "./db";
-import { chunkDocument } from "../../ingest/lib/chunk";
-import { embedPending } from "./upload-pipeline";
+import { db } from "@/lib/db";
+import { chunkDocument } from "@ingest/lib/chunk";
+import { embedPending } from "@/lib/upload-pipeline";
 import { createHash } from "node:crypto";
-import { refreshStats } from "./corpus-stats";
-import { recordVersion } from "./versions";
+import { refreshStats } from "@/lib/corpus-stats";
+import { recordVersion } from "@/lib/versions";
 
 /**
  * The client-editable knowledge entry, stored in the database and edited

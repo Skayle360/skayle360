@@ -1,5 +1,5 @@
-import { retrieve, isThin } from "../../src/lib/retrieval";
-import { db } from "../../src/lib/db";
+import { retrieve, isThin } from "@/lib/retrieval";
+import { db } from "@/lib/db";
 
 const CASES: Array<{ q: string; want: RegExp }> = [
   { q: "we're a nonprofit with 40 employees in Rhode Island - do we qualify?", want: /massachusetts/i },

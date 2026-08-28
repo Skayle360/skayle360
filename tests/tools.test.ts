@@ -3,9 +3,9 @@
  *   DATABASE_URL=... npx tsx tests/tools.test.ts
  */
 import { randomUUID } from "node:crypto";
-import { runTool, type ToolContext } from "../src/lib/tools";
-import { db } from "../src/lib/db";
-import { BOOKING_URL } from "../config/app";
+import { runTool, type ToolContext } from "@/lib/tools";
+import { db } from "@/lib/db";
+import { BOOKING_URL } from "@config/app";
 
 let failures = 0;
 const check = (name: string, cond: boolean, detail = "") => {

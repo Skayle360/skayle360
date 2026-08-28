@@ -1,4 +1,4 @@
-import type { Segment } from "./extract";
+import type { Segment } from "@ingest/lib/extract";
 
 export interface Chunk {
   /** Stable id: `${docId}#${index}` — re-running ingestion reproduces it exactly. */
