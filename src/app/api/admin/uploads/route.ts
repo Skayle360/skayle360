@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { createHash } from "node:crypto";
-import { isAuthenticated } from "../../../../lib/admin-auth";
-import { db } from "../../../../lib/db";
-import { processUpload, removeUpload, isSupported, MAX_BYTES } from "../../../../lib/upload-pipeline";
+import { isAuthenticated } from "@/lib/admin-auth";
+import { db } from "@/lib/db";
+import { processUpload, removeUpload, isSupported, MAX_BYTES } from "@/lib/upload-pipeline";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

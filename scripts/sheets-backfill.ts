@@ -8,8 +8,8 @@
  *
  *   npm run sheets:backfill
  */
-import { db } from "../src/lib/db";
-import { GoogleSheetsLeadSink } from "../src/lib/sinks/sheets-sink";
+import { db } from "@/lib/db";
+import { GoogleSheetsLeadSink } from "@/lib/sinks/sheets-sink";
 
 if (!GoogleSheetsLeadSink.configured()) {
   console.error("GOOGLE_SHEET_ID and GOOGLE_SERVICE_ACCOUNT_JSON must both be set.");

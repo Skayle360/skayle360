@@ -1,6 +1,6 @@
-import { db } from "./db";
-import { CONTENT_DEPTH_POLICY, LEAD_CAPTURE_MODES, LEAD_CAPTURE_POLICY } from "./prompt";
-import { recordVersion } from "./versions";
+import { db } from "@/lib/db";
+import { CONTENT_DEPTH_POLICY, LEAD_CAPTURE_MODES, LEAD_CAPTURE_POLICY } from "@/lib/prompt";
+import { recordVersion } from "@/lib/versions";
 
 /**
  * Prompt blocks the admin page may change, and their code defaults.

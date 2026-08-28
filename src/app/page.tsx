@@ -1,5 +1,5 @@
-import { ALLOWED_ORIGINS } from "../../config/app";
-import "./home.css";
+import { ALLOWED_ORIGINS } from "@config/app";
+import "@/app/home.css";
 
 export const metadata = {
   title: "SCALE UP assistant — preview",

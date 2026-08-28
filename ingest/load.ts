@@ -8,9 +8,9 @@
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { db } from "../src/lib/db";
-import { getEmbedder, toVectorLiteral, estimateTokens } from "../src/lib/embeddings";
-import { excludedIds } from "../src/lib/exclusions";
+import { db } from "@/lib/db";
+import { getEmbedder, toVectorLiteral, estimateTokens } from "@/lib/embeddings";
+import { excludedIds } from "@/lib/exclusions";
 
 const DATA_DIR = process.env.OUT_DIR ?? new URL("../data", import.meta.url).pathname;
 /**

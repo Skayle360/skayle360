@@ -1,4 +1,4 @@
-import { ALLOWED_ORIGINS } from "../../config/app";
+import { ALLOWED_ORIGINS } from "@config/app";
 
 /**
  * The widget runs in an iframe on the client's Webflow site, so requests are

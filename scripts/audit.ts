@@ -6,8 +6,8 @@
  */
 import { randomUUID } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
-import { runChat } from "../src/lib/chat";
-import { db } from "../src/lib/db";
+import { runChat } from "@/lib/chat";
+import { db } from "@/lib/db";
 
 const file = process.argv[2];
 if (!file) { console.error("usage: npm run audit -- <file of questions>"); process.exit(1); }

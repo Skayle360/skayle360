@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { runChat, type ChatEvent } from "../../../lib/chat";
-import { corsHeaders, isAllowedOrigin } from "../../../lib/cors";
-import { db } from "../../../lib/db";
+import { runChat, type ChatEvent } from "@/lib/chat";
+import { corsHeaders, isAllowedOrigin } from "@/lib/cors";
+import { db } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

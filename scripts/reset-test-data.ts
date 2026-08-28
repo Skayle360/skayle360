@@ -4,7 +4,7 @@
  * point this at production.
  */
 import { google } from "googleapis";
-import { db } from "../src/lib/db";
+import { db } from "@/lib/db";
 
 const { rows } = await db().query<{ n: string }>("SELECT count(*)::text AS n FROM leads");
 await db().query("TRUNCATE turns, escalations, leads, conversations RESTART IDENTITY CASCADE");

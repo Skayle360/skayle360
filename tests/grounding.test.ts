@@ -3,8 +3,8 @@
  * response blocks rather than only in live conversation.
  *   npx tsx tests/grounding.test.ts
  */
-import { enforceGrounding, shouldShowBlock, detectCohortConflict } from "../src/lib/grounding";
-import type { RetrievedChunk } from "../src/lib/retrieval";
+import { enforceGrounding, shouldShowBlock, detectCohortConflict } from "@/lib/grounding";
+import type { RetrievedChunk } from "@/lib/retrieval";
 
 const chunk = (id: string, text: string, locator: string | null, label: string): RetrievedChunk => ({
   id, docId: id, text, heading: null, locator, title: label, sourceLabel: label,

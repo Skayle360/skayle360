@@ -7,8 +7,8 @@
  *
  *   npm run embed
  */
-import { db } from "../src/lib/db";
-import { getEmbedder, toVectorLiteral, estimateTokens } from "../src/lib/embeddings";
+import { db } from "@/lib/db";
+import { getEmbedder, toVectorLiteral, estimateTokens } from "@/lib/embeddings";
 
 const BATCH_TOKENS = Number(process.env.EMBED_BATCH_TOKENS ?? 8_000);
 const PAUSE_MS = Number(process.env.EMBED_PAUSE_MS ?? 21_000);

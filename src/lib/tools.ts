@@ -1,7 +1,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { bookingLink, BOOKING_ROUTE_NAMES } from "../../config/app";
-import { leadSink, type Escalation, type Lead } from "./sinks/index";
-import { sendEscalation } from "./email";
+import { bookingLink, BOOKING_ROUTE_NAMES } from "@config/app";
+import { leadSink, type Escalation, type Lead } from "@/lib/sinks";
+import { sendEscalation } from "@/lib/email";
 
 /**
  * Structured work goes through tools because citations and

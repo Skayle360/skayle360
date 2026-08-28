@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { db } from "@/lib/db";
 
 /**
  * History for anything editable through the admin page — the prompt blocks and

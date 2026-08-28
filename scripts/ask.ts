@@ -6,8 +6,8 @@
  *   npm run ask -- "we're a nonprofit in Rhode Island, do we qualify?"
  */
 import { randomUUID } from "node:crypto";
-import { runChat } from "../src/lib/chat";
-import { db } from "../src/lib/db";
+import { runChat } from "@/lib/chat";
+import { db } from "@/lib/db";
 
 const question = process.argv.slice(2).join(" ").trim();
 if (!question) {

@@ -9,9 +9,9 @@
  */
 import { randomUUID } from "node:crypto";
 import { google } from "googleapis";
-import { runChat } from "../src/lib/chat";
-import { db } from "../src/lib/db";
-import { BOOKING_URL } from "../config/app";
+import { runChat } from "@/lib/chat";
+import { db } from "@/lib/db";
+import { BOOKING_URL } from "@config/app";
 
 const ok = (s: string) => `\x1b[32m  PASS\x1b[0m  ${s}`;
 const no = (s: string) => `\x1b[31m  FAIL\x1b[0m  ${s}`;

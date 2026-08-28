@@ -1,6 +1,6 @@
-import { FanOutLeadSink, type LeadSink } from "./lead-sink";
-import { PostgresLeadSink } from "./postgres-sink";
-import { GoogleSheetsLeadSink } from "./sheets-sink";
+import { FanOutLeadSink, type LeadSink } from "@/lib/sinks/lead-sink";
+import { PostgresLeadSink } from "@/lib/sinks/postgres-sink";
+import { GoogleSheetsLeadSink } from "@/lib/sinks/sheets-sink";
 
 let sink: LeadSink | null = null;
 
@@ -18,4 +18,4 @@ export function leadSink(): LeadSink {
   return sink;
 }
 
-export * from "./lead-sink";
+export * from "@/lib/sinks/lead-sink";

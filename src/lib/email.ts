@@ -1,7 +1,7 @@
 import { Resend } from "resend";
-import { db } from "./db";
-import { MAIL_FROM, escalationRecipient, canSendEscalationEmail, ESCALATION_LIVE, ESCALATION_TEST_INBOX, CONTACT_EMAIL } from "../../config/app";
-import type { Escalation } from "./sinks/lead-sink";
+import { db } from "@/lib/db";
+import { MAIL_FROM, escalationRecipient, canSendEscalationEmail, ESCALATION_LIVE, ESCALATION_TEST_INBOX, CONTACT_EMAIL } from "@config/app";
+import type { Escalation } from "@/lib/sinks/lead-sink";
 
 /**
  * PENDING CLIENT ANSWER: DNS access for a sending domain.

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { isAuthenticated } from "../../../../lib/admin-auth";
-import { listExclusions, excludeDocument, restoreDocument } from "../../../../lib/exclusions";
+import { isAuthenticated } from "@/lib/admin-auth";
+import { listExclusions, excludeDocument, restoreDocument } from "@/lib/exclusions";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

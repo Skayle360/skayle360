@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
-import { db } from "./db";
-import { extractAsync } from "../../ingest/lib/extract";
-import { chunkDocument } from "../../ingest/lib/chunk";
-import { getEmbedder, toVectorLiteral, estimateTokens } from "./embeddings";
-import { refreshStats } from "./corpus-stats";
+import { db } from "@/lib/db";
+import { extractAsync } from "@ingest/lib/extract";
+import { chunkDocument } from "@ingest/lib/chunk";
+import { getEmbedder, toVectorLiteral, estimateTokens } from "@/lib/embeddings";
+import { refreshStats } from "@/lib/corpus-stats";
 
 /**
  * Takes an uploaded file from bytes to answerable, updating its status as it

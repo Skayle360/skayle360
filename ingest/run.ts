@@ -10,13 +10,13 @@ import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, extname } from "node:path";
 import { unzipSync } from "fflate";
-import { extract, type Segment } from "./lib/extract";
-import { chunkDocument, type Chunk } from "./lib/chunk";
-import { catalogEntry, renderCatalogDocument, type CatalogEntry } from "./lib/catalog";
-import { dropNearDuplicates, type NearDupe } from "./lib/neardupe";
-import { findCohortMentions, auditCohorts, type CohortMention } from "./lib/cohort";
-import { fetchKnowledgeDoc } from "../src/lib/knowledge-doc";
-import type { CrawledPage } from "./lib/crawl-core";
+import { extract, type Segment } from "@ingest/lib/extract";
+import { chunkDocument, type Chunk } from "@ingest/lib/chunk";
+import { catalogEntry, renderCatalogDocument, type CatalogEntry } from "@ingest/lib/catalog";
+import { dropNearDuplicates, type NearDupe } from "@ingest/lib/neardupe";
+import { findCohortMentions, auditCohorts, type CohortMention } from "@ingest/lib/cohort";
+import { fetchKnowledgeDoc } from "@/lib/knowledge-doc";
+import type { CrawledPage } from "@ingest/lib/crawl-core";
 import {
   FULL_TEXT_BASENAMES,
   BLOG_ARCHIVES,
@@ -26,7 +26,7 @@ import {
   UNSUPPORTED_EXTENSIONS,
   isArchiveRootDuplicate,
   moduleOf,
-} from "../config/sources";
+} from "@config/sources";
 
 const SOURCE_DIR = process.env.SOURCE_DIR ?? "/home/haris-awais/devminified/ai-agent";
 const OUT_DIR = process.env.OUT_DIR ?? new URL("../data", import.meta.url).pathname;
