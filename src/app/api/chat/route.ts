@@ -18,15 +18,20 @@ const Body = z.object({
 });
 
 export async function OPTIONS(req: NextRequest) {
-  return new Response(null, { status: 204, headers: corsHeaders(req.headers.get("origin")) });
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders(req.headers.get("origin"), req.headers.get("host")),
+  });
 }
 
 export async function POST(req: NextRequest) {
   const origin = req.headers.get("origin");
-  const headers = corsHeaders(origin);
+  const host = req.headers.get("host");
+  const headers = corsHeaders(origin, host);
 
-  // Same-origin requests (the widget page itself) send no Origin header.
-  if (origin !== null && !isAllowedOrigin(origin)) {
+  // A missing Origin means a same-origin navigation or a server-side call.
+  // A present one must be either an allowed embedder or this app's own host.
+  if (origin !== null && !isAllowedOrigin(origin) && !Object.hasOwn(headers, "access-control-allow-origin")) {
     return Response.json({ error: "origin not allowed" }, { status: 403, headers });
   }
 

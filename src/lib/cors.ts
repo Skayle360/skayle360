@@ -16,8 +16,26 @@ const LOCALHOST = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 const isDevLocalhost = (origin: string): boolean =>
   process.env.NODE_ENV !== "production" && LOCALHOST.test(origin);
 
-export function corsHeaders(origin: string | null): Record<string, string> {
-  const allowed = origin !== null && isAllowedOrigin(origin);
+/**
+ * A page served by this app calling this app's own API is same-origin, and the
+ * allowlist has nothing to do with it — that list exists to control which
+ * *other* sites may embed the widget.
+ *
+ * Without this the widget could not run on its own deployment: the preview page
+ * and the API share an origin, but the deployment URL is not in the client's
+ * two domains, so its own requests were refused.
+ */
+function isSameOrigin(origin: string, host: string | null): boolean {
+  if (!host) return false;
+  try {
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+}
+
+export function corsHeaders(origin: string | null, host?: string | null): Record<string, string> {
+  const allowed = origin !== null && (isAllowedOrigin(origin) || isSameOrigin(origin, host ?? null));
   return {
     ...(allowed ? { "access-control-allow-origin": origin } : {}),
     "access-control-allow-methods": "POST, OPTIONS",
