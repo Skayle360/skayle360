@@ -1,10 +1,38 @@
 /**
- * Clears leads, escalations and conversations from Postgres and wipes the
- * Sheet's data rows. For clearing out testing noise before a real run — never
- * point this at production.
+ * Clears leads, escalations and conversations, and wipes the Sheet's data rows.
+ *
+ * This project runs one database for local work and production, so there is no
+ * "test" copy to point this at — running it deletes real enquiries the client
+ * has received. It therefore refuses unless CONFIRM_WIPE names the host it is
+ * about to clear, and it shows what will be lost first.
+ *
+ *   CONFIRM_WIPE=<db host> npm run reset:testdata
  */
 import { google } from "googleapis";
 import { db } from "@/lib/db";
+
+const host = new URL(process.env.DATABASE_URL ?? "postgres://x/y").host;
+
+const { rows: [counts] } = await db().query<{ leads: string; escalations: string; conversations: string }>(
+  `SELECT (SELECT count(*) FROM leads)::text AS leads,
+          (SELECT count(*) FROM escalations)::text AS escalations,
+          (SELECT count(*) FROM conversations)::text AS conversations`,
+);
+
+if (process.env.CONFIRM_WIPE !== host) {
+  console.error(
+    `\nThis deletes every lead and enquiry on ${host}:\n` +
+      `  ${counts!.leads} lead(s)\n` +
+      `  ${counts!.escalations} unanswered question(s)\n` +
+      `  ${counts!.conversations} conversation(s)\n` +
+      `and clears the Google Sheet.\n\n` +
+      `There is no separate test database, so these may be real enquiries.\n` +
+      `If you are sure, re-run with:\n\n` +
+      `  CONFIRM_WIPE=${host} npm run reset:testdata\n`,
+  );
+  await db().end();
+  process.exit(1);
+}
 
 const { rows } = await db().query<{ n: string }>("SELECT count(*)::text AS n FROM leads");
 await db().query("TRUNCATE turns, escalations, leads, conversations RESTART IDENTITY CASCADE");

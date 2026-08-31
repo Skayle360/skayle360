@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { MODEL } from "@config/app";
+import { MODEL, bookingLink } from "@config/app";
 import { buildSystemPrompt } from "@/lib/prompt";
 import { loadSettings } from "@/lib/settings";
 import { TOOL_DEFINITIONS, runTool, type ToolContext } from "@/lib/tools";
@@ -140,6 +140,11 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
 
   // Resolved once per conversation turn, not per tool round: the prompt is the
   // cached prefix, so it must be byte-identical across the whole exchange.
+  const answerText: string[] = [];
+  const emitText = (text: string) => {
+    answerText.push(text);
+    emit({ type: "text", text });
+  };
   const systemPrompt = await cachedSystem();
   const usage: UsageSummary = emptyUsage();
   // Whether a tool did the work this exchange — a booking link fetched, details
@@ -151,6 +156,8 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
   // intentions a visitor can have. "How do I book a meeting?" fetched the link
   // and then escalated the sentence offering it.
   let toolActed = false;
+  // Whether a booking button has actually been sent to the widget this turn.
+  let bookingOffered = false;
   let grounded = false;
   let anyText = false;
 
@@ -202,7 +209,7 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
 
     if (verdict.text) {
       if (verdict.grounded) {
-        emit({ type: "text", text: (anyText ? "\n\n" : "") + verdict.text });
+        emitText((anyText ? "\n\n" : "") + verdict.text);
         if (verdict.sources.length) emit({ type: "sources", sources: verdict.sources });
         grounded = true;
         anyText = true;
@@ -221,7 +228,7 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
         // dropped, but neither case escalates.
         const CLOSING_LINE_LIMIT = 320;
         if (verdict.text.length <= CLOSING_LINE_LIMIT) {
-          emit({ type: "text", text: (anyText ? "\n\n" : "") + verdict.text });
+          emitText((anyText ? "\n\n" : "") + verdict.text);
           anyText = true;
         } else {
           console.warn(
@@ -244,6 +251,7 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
     }
 
     if (!toolUses.length) {
+      ensureBookingLink(answerText.join(" "), bookingOffered, emit);
       emit({ type: "done", grounded, usage });
       return;
     }
@@ -256,7 +264,10 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
     for (const use of toolUses) {
       try {
         const outcome = await runTool(use.name, use.input, ctx);
-        if (outcome.bookingUrl) emit({ type: "booking", url: outcome.bookingUrl });
+        if (outcome.bookingUrl) {
+          emit({ type: "booking", url: outcome.bookingUrl });
+          bookingOffered = true;
+        }
         if (outcome.escalated) emit({ type: "escalated" });
         toolActed = true;
         results.push({ type: "tool_result", tool_use_id: use.id, content: outcome.result });
@@ -290,6 +301,32 @@ function escalationReply(ctx: ToolContext, opening: string): string {
   return reachable
     ? `${opening} I've passed it to Chris and he'll email you.`
     : `${opening} Chris can answer it properly — if you leave your name, email and company I'll send it straight to him. Otherwise you can book a quick call with him and ask directly.`;
+}
+
+
+/**
+ * Keeps the promise the answer made.
+ *
+ * The prompt tells the model to fetch a booking link whenever it invites
+ * someone to a call, but a prompt is guidance, not a guarantee — in practice it
+ * complies on some turns and not others, leaving replies that say "here's a
+ * link to book fifteen minutes with Chris" with no button underneath. That is
+ * the exact dead end the client reported.
+ *
+ * So the promise is checked against what was actually sent, and the link is
+ * supplied if the model forgot. Cheap, and it cannot be forgotten.
+ */
+const PROMISES_A_LINK =
+  /\b(here'?s? (?:a|the) link|link to book|book (?:a|fifteen|15)|booking link|link below|link above|schedule a call|book that call)\b/i;
+
+function ensureBookingLink(
+  text: string,
+  alreadyOffered: boolean,
+  emit: (e: ChatEvent) => void,
+): void {
+  if (alreadyOffered || !PROMISES_A_LINK.test(text)) return;
+  console.warn("[booking] the reply promised a link the model did not fetch; supplying the default");
+  emit({ type: "booking", url: bookingLink("general").url });
 }
 
 async function escalate(
