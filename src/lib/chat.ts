@@ -142,6 +142,15 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
   // cached prefix, so it must be byte-identical across the whole exchange.
   const systemPrompt = await cachedSystem();
   const usage: UsageSummary = emptyUsage();
+  // Whether a tool did the work this exchange — a booking link fetched, details
+  // captured, a question handed to Chris.
+  //
+  // The turn after a tool runs is an acknowledgement, not an answer: "here's a
+  // link to book", "thanks, got it". It carries no citations because it claims
+  // nothing, so judging it as an answer escalated the two most direct
+  // intentions a visitor can have. "How do I book a meeting?" fetched the link
+  // and then escalated the sentence offering it.
+  let toolActed = false;
   let grounded = false;
   let anyText = false;
 
@@ -197,14 +206,19 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
         if (verdict.sources.length) emit({ type: "sources", sources: verdict.sources });
         grounded = true;
         anyText = true;
-      } else if (grounded) {
-        // A later turn in the same exchange, after a cited answer was already
-        // shown. These are closing lines — "here's the link to book fifteen
-        // minutes" — which carry no citations because they assert nothing.
-        // Judging them like a fresh answer withheld the sign-off and escalated
-        // a question that had in fact been answered. Short ones are shown;
-        // anything long enough to smuggle in a claim is dropped, but neither
-        // case escalates.
+      } else if (grounded || toolActed || toolUses.length > 0) {
+        // Text that accompanies or follows a tool call. These are lead-ins and
+        // sign-offs — "here's the link to book fifteen minutes", "I've sent
+        // that to Chris" — which carry no citations because they assert
+        // nothing.
+        //
+        // `toolUses.length` covers the turn the tool is requested on, because
+        // `toolActed` is only set once the tool has run. Without it the lead-in
+        // was dropped and the reply began mid-thought: "He'll come back to you
+        // by email" with nothing before it to say who or why.
+        //
+        // Short ones are shown; anything long enough to smuggle in a claim is
+        // dropped, but neither case escalates.
         const CLOSING_LINE_LIMIT = 320;
         if (verdict.text.length <= CLOSING_LINE_LIMIT) {
           emit({ type: "text", text: (anyText ? "\n\n" : "") + verdict.text });
@@ -215,7 +229,7 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
               `(${verdict.text.length} chars); the cited answer above still stands`,
           );
         }
-      } else if (!toolUses.length) {
+      } else if (!toolUses.length && !toolActed) {
         // Asserted something it could not support: exactly the failure this bot
         // exists to prevent. Withhold the draft entirely and hand off.
         console.warn(
@@ -244,6 +258,7 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
         const outcome = await runTool(use.name, use.input, ctx);
         if (outcome.bookingUrl) emit({ type: "booking", url: outcome.bookingUrl });
         if (outcome.escalated) emit({ type: "escalated" });
+        toolActed = true;
         results.push({ type: "tool_result", tool_use_id: use.id, content: outcome.result });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -293,7 +308,8 @@ async function escalate(
     lead: ctx.lead,
   };
   try {
-    const { id } = await leadSink().saveEscalation(escalation);
+    const leadId = ctx.lead.email || ctx.lead.name ? (await leadSink().saveLead(ctx.lead)).id : null;
+    const { id } = await leadSink().saveEscalation({ ...escalation, leadId });
     void sendEscalation(id, escalation, { uncitedDraft: uncited, sourceUrl: req.sourceUrl });
     emit({ type: "escalated" });
   } catch (err) {

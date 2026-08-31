@@ -60,9 +60,16 @@ async function main() {
         FROM chunks WHERE embedding IS NOT NULL`);
     const { rows: [carry] } = await client.query<{ n: string }>("SELECT count(*)::text AS n FROM kept_embeddings");
 
-    // Replace wholesale. A document removed from the source policy must
-    // actually disappear from the index.
-    await client.query("DELETE FROM documents");
+    // Replace what this pipeline owns — and only that.
+    //
+    // Documents added through the admin page (uploads, and the client's own
+    // notes) do not come from the source folder and are not in the manifest, so
+    // a blanket DELETE removed them and nothing put them back. Uploading a file
+    // and then re-indexing for any unrelated reason silently destroyed it.
+    await client.query(
+      `DELETE FROM documents
+        WHERE doc_id NOT LIKE 'upload-%' AND doc_id <> 'client-knowledge'`,
+    );
 
     for (const d of keptDocs) {
       await client.query(
@@ -85,8 +92,15 @@ async function main() {
       UPDATE chunks c SET embedding = k.embedding
         FROM kept_embeddings k
        WHERE k.id = c.id AND k.text_md5 = md5(c.text)`);
-    console.log(`Reused ${restored ?? 0} of ${carry!.n} existing embeddings; ${
-      chunks.length - (restored ?? 0)} chunk(s) need embedding.`);
+    // Counted from the table, not from the manifest: admin uploads and the
+    // client's notes are in `chunks` but not in `chunks.length`, which made the
+    // arithmetic go negative once anything had been uploaded.
+    const { rows: [pending] } = await client.query<{ n: string }>(
+      "SELECT count(*)::text AS n FROM chunks WHERE embedding IS NULL",
+    );
+    console.log(
+      `Reused ${restored ?? 0} of ${carry!.n} existing embeddings; ${pending!.n} chunk(s) need embedding.`,
+    );
 
     // Expand each chunk's tsvector into per-term frequencies. `unnest(tsvector)`
     // yields (lexeme, positions, weights); the position array length is the

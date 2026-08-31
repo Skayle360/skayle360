@@ -23,7 +23,8 @@
     "audit": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/audit.ts",
     "embed": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/embed.ts",
     "audit:compare": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/audit-compare.ts",
-    "dev:mirror": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/make-mirror.ts"
+    "dev:mirror": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/make-mirror.ts",
+    "doc:check": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs scripts/doc-check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.121.0",

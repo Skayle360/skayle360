@@ -36,6 +36,20 @@ should be ignored.
 Any end date of April 1, 2027 for the Winter cohort is incorrect. The correct end
 date is March 25, 2027.
 
+## Where SCALE UP is available
+
+SCALE UP is delivered live over Zoom, so it is not limited to one state. Skayle
+360 is expanding beyond Massachusetts and companies outside the state can join
+a cohort.
+
+Funding is the part that is state-specific. The Massachusetts Workforce
+Training Fund Express Grant covers Massachusetts employers only. Other states
+run their own programmes; answer from whatever documents cover that state, and
+only offer a call if nothing here covers it.
+
+Older material describes SCALE UP as being for Massachusetts companies. That
+wording is out of date.
+
 ## Contact
 
 Questions that need a person go to Chris Ciunci at cciunci@skayle360.com.
