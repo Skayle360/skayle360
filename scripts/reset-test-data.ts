@@ -1,10 +1,6 @@
 /**
  * Clears leads, escalations and conversations, and wipes the Sheet's data rows.
- *
- * This project runs one database for local work and production, so there is no
- * "test" copy to point this at — running it deletes real enquiries the client
- * has received. It therefore refuses unless CONFIRM_WIPE names the host it is
- * about to clear, and it shows what will be lost first.
+ * Requires CONFIRM_WIPE to name the database host.
  *
  *   CONFIRM_WIPE=<db host> npm run reset:testdata
  */

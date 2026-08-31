@@ -156,7 +156,6 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
   // intentions a visitor can have. "How do I book a meeting?" fetched the link
   // and then escalated the sentence offering it.
   let toolActed = false;
-  // Whether a booking button has actually been sent to the widget this turn.
   let bookingOffered = false;
   let grounded = false;
   let anyText = false;
@@ -304,18 +303,7 @@ function escalationReply(ctx: ToolContext, opening: string): string {
 }
 
 
-/**
- * Keeps the promise the answer made.
- *
- * The prompt tells the model to fetch a booking link whenever it invites
- * someone to a call, but a prompt is guidance, not a guarantee — in practice it
- * complies on some turns and not others, leaving replies that say "here's a
- * link to book fifteen minutes with Chris" with no button underneath. That is
- * the exact dead end the client reported.
- *
- * So the promise is checked against what was actually sent, and the link is
- * supplied if the model forgot. Cheap, and it cannot be forgotten.
- */
+/** Supplies the booking link when the reply promised one but none was sent. */
 const PROMISES_A_LINK =
   /\b(here'?s? (?:a|the) link|link to book|book (?:a|fifteen|15)|booking link|link below|link above|schedule a call|book that call)\b/i;
 
