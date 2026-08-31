@@ -18,6 +18,15 @@ export interface CrawledPage {
 
 function pageText($: cheerio.CheerioAPI): string {
   $("script, style, noscript, svg, iframe, nav, header, footer, [role=navigation], [aria-hidden=true]").remove();
+
+  // HTML has no whitespace between elements, so cheerio's .text() concatenates
+  // them: a heading followed by a paragraph became "call.Ask a question". That
+  // reads as a typo in the source quotes shown under an answer, and it also
+  // welds two real words into one token that the search index can never match.
+  // Appending a newline to every block-level element restores the boundary.
+  $("p, div, li, h1, h2, h3, h4, h5, h6, br, tr, td, th, section, article, blockquote")
+    .each((_, el) => { $(el).after("\n"); });
+
   const raw = $("main").length ? $("main").text() : $("body").text();
   return raw
     .replace(/ /g, " ")

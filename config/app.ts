@@ -100,13 +100,24 @@ export const MODEL = "claude-opus-5";
  * question is genuinely about a framework. Tune with
  * ingest/probe/pg-retrieval-test.ts.
  */
+/**
+ * Sized against the RRF scale, where adjacent ranks differ by roughly 1.5%.
+ * A multiplier of 2.5 is therefore worth about ninety places — it does not
+ * nudge a source, it pins it to the top of every query whatever was asked.
+ *
+ * That is how a note mentioning Massachusetts came to outrank a document
+ * entirely about Tennessee funding on the question "can I get funding in
+ * Tennessee?". These values are deliberately close to 1: enough to break a tie
+ * between comparable passages, never enough to beat one that actually answers
+ * the question.
+ */
 export const SOURCE_WEIGHTS: Readonly<Record<string, number>> = {
-  correction: 2.5,        // the client's own overrides settle any disagreement
-  website: 1.6,           // pages that exist to describe the offering
+  correction: 1.30,       // the client's own overrides win a close call
+  website: 1.10,          // pages that exist to describe the offering
   template_catalog: 1.0,
   program_document: 1.0,  // mixed: the syllabus is about the program, the ebook is not
   module_deck: 1.0,
-  blog_post: 0.85,        // written to attract readers, not to describe the program
+  blog_post: 0.92,        // written to attract readers, not to describe the program
 };
 
 /**
@@ -118,7 +129,7 @@ export const PROGRAM_DOC_IDS: readonly string[] = [
   "scale-up-program-summary",
   "chris-ciunci-bio",
 ];
-export const PROGRAM_DOC_BOOST = 1.6;
+export const PROGRAM_DOC_BOOST = 1.12;
 
 /** Retrieval shape. Top-K is what actually reaches the model as documents. */
 export const RETRIEVAL = {

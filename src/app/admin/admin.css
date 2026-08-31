@@ -256,3 +256,37 @@ tbody tr:hover td { background: var(--surface-sunk); }
   font-family: var(--mono); font-size: 12px; line-height: 1.55; white-space: pre-wrap;
 }
 button.link.small { font-size: 13px; }
+
+/* ------------------------------------------------------------------ dialog */
+/* Replaces window.confirm, which shows the host name and the browser's own
+   buttons, and gives a destructive action no more weight than a benign one. */
+.scrim {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(28, 26, 23, .42);
+  display: grid; place-items: center; padding: 24px;
+  animation: scrim-in .12s ease;
+}
+@keyframes scrim-in { from { opacity: 0 } to { opacity: 1 } }
+
+.dialog {
+  width: 100%; max-width: 400px;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--rule); border-radius: 12px;
+  padding: 20px 22px 18px;
+  box-shadow: 0 12px 40px rgba(28, 26, 23, .28);
+  animation: dialog-in .14s ease;
+}
+@keyframes dialog-in { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+@media (prefers-reduced-motion: reduce) {
+  .scrim, .dialog { animation: none; }
+}
+
+.dialog h2 { font-size: 15px; font-weight: 600; margin: 0 0 6px; letter-spacing: -.01em; }
+.dialog p { margin: 0 0 18px; color: var(--ink-soft); font-size: 14px; line-height: 1.55; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* A destructive confirm should read as destructive, not as the house accent. */
+button.danger-solid {
+  background: var(--bad); border-color: var(--bad); color: #fff;
+}
+button.danger-solid:hover:not(:disabled) { filter: brightness(1.08); }

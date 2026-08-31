@@ -131,7 +131,10 @@ export async function runTool(name: string, input: unknown, ctx: ToolContext): P
         transcript: ctx.transcript,
         lead: ctx.lead,
       };
-      const { id } = await leadSink().saveEscalation(escalation);
+      // Attach the lead record, so Chris opens the escalation with the
+      // visitor's details rather than having to match them up by hand.
+      const leadId = ctx.lead.email || ctx.lead.name ? (await leadSink().saveLead(ctx.lead)).id : null;
+      const { id } = await leadSink().saveEscalation({ ...escalation, leadId });
       // Fire and forget: a slow mail provider must not stall the visitor's
       // reply. The row is already durable, and failures are retryable from it.
       void sendEscalation(id, escalation, { sourceUrl: ctx.sourceUrl });

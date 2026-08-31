@@ -44,6 +44,7 @@ export default function Admin() {
   const [busy, setBusy] = useState("");
   const [notice, setNotice] = useState("");
   const [loadError, setLoadError] = useState("");
+  const [confirming, setConfirming] = useState<Confirming | null>(null);
 
   /** Any failure must resolve the loading state, or the page hangs with no reason shown. */
   const loadDocuments = useCallback(async () => {
@@ -126,11 +127,12 @@ export default function Admin() {
         )}
         {tab === "documents" && (
           <Documents uploads={uploads} docs={docs} excluded={excluded} busy={busy} setBusy={setBusy}
-                     setNotice={setNotice} reload={loadDocuments} />
+                     setNotice={setNotice} reload={loadDocuments} confirm={setConfirming} />
         )}
-        {tab === "knowledge" && <Knowledge reload={loadDocuments} />}
-        {tab === "prompts" && <Prompts settings={settings} reload={loadSettings} />}
+        {tab === "knowledge" && <Knowledge reload={loadDocuments} confirm={setConfirming} />}
+        {tab === "prompts" && <Prompts settings={settings} reload={loadSettings} confirm={setConfirming} />}
       </main>
+      <Confirm req={confirming} onClose={() => setConfirming(null)} />
     </div>
   );
 }
@@ -178,20 +180,26 @@ function Login({ error, onIn }: { error: string; onIn: () => void }) {
   );
 }
 
-function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload }: {
+function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload, confirm }: {
   uploads: Upload[]; docs: Doc[]; excluded: Excluded[]; busy: string;
   setBusy: (s: string) => void; setNotice: (s: string) => void; reload: () => Promise<void>;
+  confirm: (c: Confirming) => void;
 }) {
   const [dragging, setDragging] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   /** Removing an indexed source also records it, so a re-ingest cannot restore it. */
-  async function removeDoc(d: Doc) {
-    if (!confirm(
-      `Remove "${d.title}" from the knowledge base?\n\n` +
-      `The assistant stops answering from it immediately, and it will stay out ` +
-      `even after a full re-index. You can put it back from the list below.`,
-    )) return;
+  function removeDoc(d: Doc) {
+    confirm({
+      title: `Remove “${d.title}”?`,
+      body: "The assistant stops answering from it immediately, and it stays out even after a full re-index. You can put it back from the Removed list.",
+      confirmLabel: "Remove",
+      danger: true,
+      onConfirm: () => doRemoveDoc(d),
+    });
+  }
+
+  async function doRemoveDoc(d: Doc) {
     setBusy(`Removing ${d.title}…`);
     const res = await fetch("/api/admin/documents", {
       method: "DELETE", headers: { "content-type": "application/json" },
@@ -227,8 +235,17 @@ function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload }
     if (fileInput.current) fileInput.current.value = "";
   }
 
-  async function remove(u: Upload) {
-    if (!confirm(`Remove "${u.filename}"? The assistant stops answering from it immediately.`)) return;
+  function remove(u: Upload) {
+    confirm({
+      title: `Remove “${u.filename}”?`,
+      body: "The assistant stops answering from it immediately. You can put it back from the Removed list.",
+      confirmLabel: "Remove",
+      danger: true,
+      onConfirm: () => doRemove(u),
+    });
+  }
+
+  async function doRemove(u: Upload) {
     setBusy(`Removing ${u.filename}…`);
     await fetch("/api/admin/uploads", {
       method: "DELETE", headers: { "content-type": "application/json" },
@@ -363,7 +380,7 @@ function Pipeline({ status }: { status: string }) {
   );
 }
 
-function Prompts({ settings, reload }: { settings: Setting[]; reload: () => void }) {
+function Prompts({ settings, reload, confirm }: { settings: Setting[]; reload: () => void; confirm: (c: Confirming) => void }) {
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState("");
 
@@ -443,7 +460,7 @@ function Prompts({ settings, reload }: { settings: Setting[]; reload: () => void
                   ? <span className="saved">Saved · live within 30s</span>
                   : <span className="tag">{value.length} chars</span>}
               </div>
-              <History settingKey={s.key} current={s.value} onRestore={reload} />
+              <History settingKey={s.key} current={s.value} onRestore={reload} confirm={confirm} />
             </div>
           </section>
         );
@@ -458,7 +475,7 @@ function Prompts({ settings, reload }: { settings: Setting[]; reload: () => void
  * Plain sentences, saved and live in seconds. This is the fifth requirement —
  * "I can update the knowledge myself" — without a repository or a command.
  */
-function Knowledge({ reload }: { reload: () => Promise<void> }) {
+function Knowledge({ reload, confirm }: { reload: () => Promise<void>; confirm: (c: Confirming) => void }) {
   const [text, setText] = useState<string | null>(null);
   const [original, setOriginal] = useState("");
   const [saving, setSaving] = useState(false);
@@ -519,7 +536,7 @@ function Knowledge({ reload }: { reload: () => Promise<void> }) {
             <span className="spacer" />
             {result ? <span className="saved">{result}</span> : <span className="tag">overrides everything else</span>}
           </div>
-          <History settingKey="client_knowledge" current={original}
+          <History settingKey="client_knowledge" current={original} confirm={confirm}
                    onRestore={() => { setText(null); void (async () => {
                      const res = await fetch("/api/admin/knowledge");
                      const t = res.ok ? (await res.json()).text ?? "" : "";
@@ -537,8 +554,8 @@ interface Version {
 }
 
 /** Renders the edit trail for one editable block, with restore. */
-function History({ settingKey, current, onRestore }: {
-  settingKey: string; current: string; onRestore: () => void;
+function History({ settingKey, current, onRestore, confirm }: {
+  settingKey: string; current: string; onRestore: () => void; confirm: (c: Confirming) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [versions, setVersions] = useState<Version[] | null>(null);
@@ -552,8 +569,16 @@ function History({ settingKey, current, onRestore }: {
 
   useEffect(() => { if (open && versions === null) void load(); }, [open, versions, load]);
 
-  async function restore(v: Version) {
-    if (!confirm(`Restore the version from ${when(v.created_at)}? The current text is kept in the history.`)) return;
+  function restore(v: Version) {
+    confirm({
+      title: `Restore the version from ${when(v.created_at)}?`,
+      body: "The text currently in use is kept in the history, so this can be undone.",
+      confirmLabel: "Restore",
+      onConfirm: () => doRestore(v),
+    });
+  }
+
+  async function doRestore(v: Version) {
     setBusy(true);
     await fetch("/api/admin/versions", {
       method: "POST", headers: { "content-type": "application/json" },
@@ -613,4 +638,50 @@ function when(iso: string): string {
   if (mins < 60) return `${mins} min ago`;
   if (mins < 60 * 24) return `${Math.round(mins / 60)} hr ago`;
   return d.toLocaleDateString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+
+interface Confirming {
+  title: string;
+  body: string;
+  confirmLabel: string;
+  danger?: boolean;
+  onConfirm: () => void | Promise<void>;
+}
+
+/**
+ * Confirmation dialog.
+ *
+ * Replaces window.confirm, which renders as "localhost:3000 says" with the
+ * browser's own buttons — it cannot be styled, it names the host rather than
+ * the app, and on a destructive action it gives no visual weight to the
+ * consequence.
+ */
+function Confirm({ req, onClose }: { req: Confirming | null; onClose: () => void }) {
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!req) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [req, onClose]);
+
+  if (!req) return null;
+
+  return (
+    <div className="scrim" onClick={onClose}>
+      <div className="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dlg-title"
+           onClick={(e) => e.stopPropagation()}>
+        <h2 id="dlg-title">{req.title}</h2>
+        <p>{req.body}</p>
+        <div className="dialog-actions">
+          <button className="ghost" onClick={onClose} disabled={busy}>Cancel</button>
+          <button className={req.danger ? "danger-solid" : ""} autoFocus disabled={busy}
+                  onClick={async () => { setBusy(true); await req.onConfirm(); setBusy(false); onClose(); }}>
+            {busy ? "Working…" : req.confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
