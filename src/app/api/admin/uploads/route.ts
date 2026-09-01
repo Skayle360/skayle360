@@ -14,7 +14,8 @@ const deny = () => Response.json({ error: "unauthorized" }, { status: 401 });
 export async function GET(req: NextRequest) {
   if (!isAuthenticated(req)) return deny();
   const { rows: uploads } = await db().query(
-    `SELECT id, filename, media_type, size_bytes, status, error, doc_id, words, chunk_count, created_at, updated_at
+    `SELECT id, filename, media_type, size_bytes, status, error, doc_id, words, chunk_count,
+            downloadable, display_name, download_count, created_at, updated_at
        FROM uploads WHERE status <> 'removed' ORDER BY created_at DESC`,
   );
   const { rows: documents } = await db().query(
@@ -75,6 +76,22 @@ export async function POST(req: NextRequest) {
   void processUpload(id);
 
   return Response.json({ id, status: "queued" }, { status: 202 });
+}
+
+/** Toggles whether visitors may download an uploaded file. */
+export async function PATCH(req: NextRequest) {
+  if (!isAuthenticated(req)) return deny();
+  const { id, downloadable, displayName } = (await req.json().catch(() => ({}))) as {
+    id?: string; downloadable?: boolean; displayName?: string;
+  };
+  if (!id) return Response.json({ error: "id required" }, { status: 400 });
+  await db().query(
+    `UPDATE uploads SET downloadable = COALESCE($2, downloadable),
+                        display_name = COALESCE($3, display_name)
+      WHERE id = $1`,
+    [id, downloadable ?? null, displayName?.trim() || null],
+  );
+  return Response.json({ ok: true });
 }
 
 export async function DELETE(req: NextRequest) {

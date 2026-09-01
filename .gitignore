@@ -25,3 +25,9 @@ public/mirror/
 
 # typescript incremental build cache
 tsconfig.tsbuildinfo
+
+# Client documents. They belong in the knowledge base, not in source control —
+# upload them through the admin page, which stores the file itself.
+*.pdf
+*.docx
+*.pptx

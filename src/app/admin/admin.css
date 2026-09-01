@@ -290,3 +290,12 @@ button.danger-solid {
   background: var(--bad); border-color: var(--bad); color: #fff;
 }
 button.danger-solid:hover:not(:disabled) { filter: brightness(1.08); }
+
+/* Marking a file downloadable is a separate decision from indexing it, so it
+   sits apart from the pipeline rather than inside it. */
+.share {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--rule-soft);
+  font-size: 13.5px; color: var(--ink-soft); cursor: pointer;
+}
+.share input { width: 14px; height: 14px; accent-color: var(--accent-solid); cursor: pointer; }

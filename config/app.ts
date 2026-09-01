@@ -74,7 +74,15 @@ export function bookingLink(route: string): { route: BookingRoute; url: string }
 }
 
 /** Widget embed origins. Anything else is refused by the API route. */
-export const ALLOWED_ORIGINS = env("ALLOWED_ORIGINS", "https://skayle360.com,https://skayle360.webflow.io")
+/**
+ * Sites permitted to embed the widget. `ai-agent-c4fa1f.webflow.io` is the
+ * client's Webflow staging site, used to try the widget before it goes on the
+ * live domain; it can be dropped once the install is on skayle360.com.
+ */
+export const ALLOWED_ORIGINS = env(
+  "ALLOWED_ORIGINS",
+  "https://skayle360.com,https://skayle360.webflow.io,https://ai-agent-c4fa1f.webflow.io",
+)
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);

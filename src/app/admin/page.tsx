@@ -6,6 +6,7 @@ import "@/app/admin/admin.css";
 interface Upload {
   id: string; filename: string; size_bytes: number; status: string; error: string | null;
   words: number | null; chunk_count: number | null; created_at: string;
+  downloadable: boolean; display_name: string | null; download_count: number;
 }
 interface Doc {
   doc_id: string; title: string; source_type: string; words: number; chunks: number; embedded: number; origin: string;
@@ -235,6 +236,14 @@ function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload, 
     if (fileInput.current) fileInput.current.value = "";
   }
 
+  async function setDownloadable(u: Upload, downloadable: boolean) {
+    await fetch("/api/admin/uploads", {
+      method: "PATCH", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ id: u.id, downloadable }),
+    });
+    await reload();
+  }
+
   function remove(u: Upload) {
     confirm({
       title: `Remove “${u.filename}”?`,
@@ -302,6 +311,18 @@ function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload, 
                   </p>
                   <button className="danger small" onClick={() => void remove(u)}>Remove</button>
                 </div>
+                {u.status === "live" && (
+                  <label className="share">
+                    <input type="checkbox" checked={u.downloadable}
+                           onChange={(e) => void setDownloadable(u, e.target.checked)} />
+                    <span>
+                      Visitors can download this
+                      {u.downloadable && u.download_count > 0 && (
+                        <span className="tag" style={{ marginLeft: 6 }}>{u.download_count} downloads</span>
+                      )}
+                    </span>
+                  </label>
+                )}
               </article>
             ))}
           </div>

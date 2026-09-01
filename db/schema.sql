@@ -209,3 +209,11 @@ CREATE TABLE IF NOT EXISTS excluded_documents (
   excluded_at timestamptz NOT NULL DEFAULT now(),
   excluded_by text
 );
+
+-- ------------------------------------------------------- downloadable files
+-- An uploaded document can be offered to visitors as a download, not only read
+-- for answers. Off by default: most documents are indexed so the assistant can
+-- answer from them, and handing the file over is a separate decision.
+ALTER TABLE uploads ADD COLUMN IF NOT EXISTS downloadable  boolean NOT NULL DEFAULT false;
+ALTER TABLE uploads ADD COLUMN IF NOT EXISTS display_name  text;
+ALTER TABLE uploads ADD COLUMN IF NOT EXISTS download_count integer NOT NULL DEFAULT 0;

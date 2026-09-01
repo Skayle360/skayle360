@@ -19,6 +19,7 @@ export type ChatEvent =
   | { type: "text"; text: string }
   | { type: "sources"; sources: SourceRef[] }
   | { type: "booking"; url: string }
+  | { type: "materials"; files: Array<{ name: string; url: string; mediaType: string; sizeBytes: number }> }
   | { type: "escalated" }
   | { type: "done"; grounded: boolean; usage: UsageSummary }
   | { type: "error"; message: string };
@@ -263,6 +264,14 @@ export async function runChat(req: ChatRequest, emit: (e: ChatEvent) => void): P
     for (const use of toolUses) {
       try {
         const outcome = await runTool(use.name, use.input, ctx);
+        if (outcome.materials?.length) {
+          emit({
+            type: "materials",
+            files: outcome.materials.map((m) => ({
+              name: m.name, url: m.url, mediaType: m.mediaType, sizeBytes: m.sizeBytes,
+            })),
+          });
+        }
         if (outcome.bookingUrl) {
           emit({ type: "booking", url: outcome.bookingUrl });
           bookingOffered = true;
