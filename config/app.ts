@@ -81,7 +81,8 @@ export function bookingLink(route: string): { route: BookingRoute; url: string }
  */
 export const ALLOWED_ORIGINS = env(
   "ALLOWED_ORIGINS",
-  "https://skayle360.com,https://skayle360.webflow.io,https://ai-agent-c4fa1f.webflow.io",
+  "https://skayle360.com,https://skayle360.webflow.io,https://ai-agent-c4fa1f.webflow.io," +
+    "http://localhost:3000,http://localhost:3111",
 )
   .split(",")
   .map((s) => s.trim())
