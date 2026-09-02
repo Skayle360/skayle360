@@ -41,9 +41,13 @@ export async function loadKnowledge(): Promise<string> {
 
 export interface SaveResult {
   chunks: number;
-  /** Always 0 — embedding is deferred so the save returns immediately. */
   embedded: number;
+  /** True when embedding did not finish in time and the note is keyword-only. */
+  pending: boolean;
 }
+
+/** How long a save will wait for embeddings before giving up on them. */
+const EMBED_BUDGET_MS = 45_000;
 
 export async function saveKnowledge(text: string, who: string, restoredFrom?: string): Promise<SaveResult> {
   const body = text.trim();
@@ -98,14 +102,39 @@ export async function saveKnowledge(text: string, who: string, restoredFrom?: st
     client.release();
   }
 
-  // Embedding runs after the response, not inside it.
+  // Embedding runs inside the request.
   //
-  // The note is already answerable the moment the transaction commits, because
-  // keyword search does not need vectors. Embedding does, and on a rate-limited
-  // key it can take a minute — which turned a three-sentence edit into a
-  // request that timed out while the save had in fact succeeded.
-  void embedPending().catch((err) => {
-    console.warn("[knowledge] embedding deferred:", err instanceof Error ? err.message : err);
+  // It used to be fire-and-forget, so a rate-limited key could not stall the
+  // save. That works on a long-lived server and never runs on Vercel, which
+  // freezes the function the moment the response is sent — so every note saved
+  // through the deployed admin kept its keyword index and silently lost its
+  // vector. A correction with one retrieval arm loses to a short document that
+  // matches the query almost exactly, which is precisely the case this feature
+  // exists to win.
+  //
+  // What forced the deferral was the corpus-stats rebuild, and that is now
+  // scoped to this document. An edit is one or two chunks — a single embedding
+  // call. The budget exists only so a dead provider cannot hold the save open
+  // until maxDuration.
+  let embedded = 0;
+  let pending = false;
+  try {
+    embedded = await withBudget(embedPending(), EMBED_BUDGET_MS);
+  } catch (err) {
+    pending = true;
+    console.warn(
+      "[knowledge] saved, but embedding did not finish — the note is answerable by keyword only. " +
+        "Run `npm run embed` to complete it. Cause:",
+      err instanceof Error ? err.message : err,
+    );
+  }
+  return { chunks: chunks.length, embedded, pending };
+}
+
+function withBudget<T>(work: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const limit = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`embedding exceeded ${ms}ms`)), ms);
   });
-  return { chunks: chunks.length, embedded: 0 };
+  return Promise.race([work, limit]).finally(() => clearTimeout(timer)) as Promise<T>;
 }

@@ -566,7 +566,14 @@ function Knowledge({ reload, confirm }: { reload: () => Promise<void>; confirm: 
     if (!res?.ok) { setError((await res?.json().catch(() => ({})))?.error ?? "Save failed"); return; }
     const r = await res.json();
     setOriginal(text);
-    setResult(`Saved — answering from it now (${r.chunks} section${r.chunks === 1 ? "" : "s"}).`);
+    // "Saved" is not the same as "fully searchable": a note that missed
+    // embedding still answers by keyword, but loses to a document that matches
+    // the wording more closely. Say which one happened.
+    setResult(
+      r.pending
+        ? `Saved (${r.chunks} section${r.chunks === 1 ? "" : "s"}) — still indexing, so it may not win against a document yet.`
+        : `Saved — answering from it now (${r.chunks} section${r.chunks === 1 ? "" : "s"}).`,
+    );
     await reload();
   }
 
