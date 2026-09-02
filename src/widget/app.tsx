@@ -9,10 +9,13 @@ interface Source {
   origin: string;
 }
 
+interface Material { name: string; url: string; mediaType: string; sizeBytes: number }
+
 interface Turn {
   role: "user" | "assistant";
   content: string;
   sources?: Source[];
+  materials?: Material[];
   bookingUrl?: string;
   escalated?: boolean;
   pending?: boolean;
@@ -145,6 +148,9 @@ function App() {
             case "booking":
               patch((t) => ({ ...t, bookingUrl: event.url }));
               break;
+            case "materials":
+              patch((t) => ({ ...t, materials: event.files }));
+              break;
             case "escalated":
               patch((t) => ({ ...t, escalated: true }));
               break;
@@ -194,6 +200,16 @@ function App() {
             ) : (
               <div class="bubble">{turn.content}</div>
             )}
+            {turn.materials?.map((m) => (
+              <a key={m.url} class="file" href={m.url} target="_blank" rel="noopener noreferrer">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"
+                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="file-name">{m.name}</span>
+                <span class="file-size">{(m.sizeBytes / 1e6).toFixed(1)} MB</span>
+              </a>
+            ))}
             {turn.bookingUrl && (
               <a class="book" href={turn.bookingUrl} target="_blank" rel="noopener noreferrer">
                 Book a 15-minute call →

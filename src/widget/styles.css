@@ -147,3 +147,16 @@ header span { display: block; font-size: 12px; opacity: .7; margin-top: 1px; }
   .panel { border-radius: 0; border: 0; }
   .turn { max-width: 96%; }
 }
+
+/* ----------------------------------------------------------- material links */
+.file {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface); color: var(--ink); text-decoration: none;
+  font-size: 13.5px; max-width: 100%;
+}
+.file + .file { margin-top: 6px; }
+.file:hover { border-color: var(--accent); background: #fdf4ec; }
+.file svg { color: var(--accent); flex-shrink: 0; }
+.file-name { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-size { color: var(--ink-muted); font-size: 12px; flex-shrink: 0; }

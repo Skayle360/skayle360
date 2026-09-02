@@ -1,6 +1,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { bookingLink, BOOKING_ROUTE_NAMES } from "@config/app";
 import { leadSink, type Escalation, type Lead } from "@/lib/sinks";
+import { listMaterials, type Material } from "@/lib/materials";
 import { sendEscalation } from "@/lib/email";
 
 /**
@@ -51,6 +52,17 @@ export const TOOL_DEFINITIONS: Anthropic.Tool[] = [
     },
   },
   {
+    name: "send_materials",
+    description:
+      "Offer the visitor Skayle 360's downloadable material — the programme overview, the syllabus, Chris's bio. Call this whenever someone asks for materials, a brochure, a deck, more information to read, or something to share with a colleague or their board. It returns what is available; if nothing is, say so rather than promising to send something.",
+    input_schema: {
+      type: "object",
+      properties: {},
+      required: [],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "escalate_to_human",
     description:
       "Send this conversation to Chris. Call this ONLY when you could not answer: the documents do not cover the question, you cannot cite what you would need to say, or the visitor asked for a person. " +
@@ -80,6 +92,8 @@ export interface ToolOutcome {
   result: string;
   /** Surfaced to the widget so it can render a booking button. */
   bookingUrl?: string;
+  /** Files the widget should render as download links. */
+  materials?: Material[];
   escalated?: boolean;
   leadCaptured?: boolean;
 }
@@ -119,6 +133,20 @@ export async function runTool(name: string, input: unknown, ctx: ToolContext): P
     case "get_booking_link": {
       const { route, url } = bookingLink(str("route") ?? "general");
       return { result: JSON.stringify({ route, url }), bookingUrl: url };
+    }
+
+    case "send_materials": {
+      const materials = await listMaterials();
+      if (!materials.length) {
+        return {
+          result:
+            "Nothing is available to download. Do not offer to send anything — say you do not have a pack, and offer the call or to take their details so Chris can follow up.",
+        };
+      }
+      return {
+        result: JSON.stringify(materials.map((m) => ({ name: m.name, type: m.mediaType }))),
+        materials,
+      };
     }
 
     case "escalate_to_human": {
