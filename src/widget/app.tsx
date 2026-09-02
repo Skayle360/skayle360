@@ -43,17 +43,25 @@ function postSize(open: boolean): void {
   parent.postMessage({ source: "skayle360-chat", type: "resize", open }, "*");
 }
 
+/** A 40 KB file rendered as "0.0 MB" reads as an upload that failed. */
+function fileSize(bytes: number): string {
+  return bytes < 1e6 ? `${Math.max(1, Math.round(bytes / 1e3))} KB` : `${(bytes / 1e6).toFixed(1)} MB`;
+}
+
 function Launcher({ onOpen }: { onOpen: () => void }) {
   return (
     <button class="launcher" onClick={onOpen} aria-label="Open the SCALE UP assistant">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      {/* Skayle 360's own mark: the 0 of "360" drawn as a full-rotation arrow.
+          Redrawn here rather than using the site's logo file, which is a 26 KB
+          Lottie export of the whole wordmark and illegible at 26px. */}
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
-          d="M21 11.5a8.38 8.38 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 4 11.5a8.38 8.38 0 0 1 8.5-8.4 8.38 8.38 0 0 1 8.5 8.4Z"
+          d="M19.24 10.06A7.5 7.5 0 1 1 14.57 4.95"
           stroke="currentColor"
-          stroke-width="1.8"
+          stroke-width="2.6"
           stroke-linecap="round"
-          stroke-linejoin="round"
         />
+        <path d="M14.2 1.1 L19.6 4.7 L13.9 7.9 Z" fill="currentColor" />
       </svg>
     </button>
   );
@@ -181,7 +189,7 @@ function App() {
       <header>
         <div>
           <strong>SCALE UP assistant</strong>
-          <span>Skayle 360</span>
+          <span>Skayle 360 · Grant · Program</span>
         </div>
         <button class="close" onClick={() => setOpen(false)} aria-label="Close">
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
@@ -191,8 +199,19 @@ function App() {
       </header>
 
       <div class="log" ref={scroller}>
+        {turns.length > 0 && (
+          <p class="daymark">
+            <span>Today</span>
+          </p>
+        )}
         {turns.map((turn, i) => (
           <div key={i} class={`turn ${turn.role}`}>
+            {turn.role === "assistant" && (
+              <span class="avatar" aria-hidden="true">
+                S
+              </span>
+            )}
+            <div class="turn-body">
             {turn.pending && !turn.content ? (
               <div class="dots" aria-label="Thinking">
                 <span /><span /><span />
@@ -207,7 +226,7 @@ function App() {
                         stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
                 <span class="file-name">{m.name}</span>
-                <span class="file-size">{(m.sizeBytes / 1e6).toFixed(1)} MB</span>
+                <span class="file-size">{fileSize(m.sizeBytes)}</span>
               </a>
             ))}
             {turn.bookingUrl && (
@@ -217,6 +236,7 @@ function App() {
             )}
             {turn.escalated && <p class="note">Sent to Chris — he'll follow up by email.</p>}
             {turn.sources && <Sources sources={turn.sources} />}
+            </div>
           </div>
         ))}
       </div>
