@@ -11,20 +11,23 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
 
+/* Palette and type taken from skayle360.com, so the tool the client logs into
+   looks like the site it feeds. --accent is the darkened orange for text on
+   light ground, where the brand #e87722 has too little contrast to read. */
 :root {
-  --ground:      #f7f6f3;
+  --ground:      #faf6f1;
   --surface:     #ffffff;
-  --surface-sunk:#f2efea;
-  --ink:         #1c1a17;
-  --ink-soft:    #6f6862;
-  --ink-faint:   #9a928a;
-  --rule:        #e6e1d9;
-  --rule-soft:   #efebe4;
+  --surface-sunk:#f2ede5;
+  --ink:         #131313;
+  --ink-soft:    #4a4a4a;
+  --ink-faint:   #7d7469;
+  --rule:        #e8e0d6;
+  --rule-soft:   #f1eae1;
 
-  --accent:      #b8560f;
-  --accent-bg:   #fdf4ec;
+  --accent:      #c75e12;
+  --accent-bg:   #fff4ea;
   --accent-solid:#e87722;
-  --accent-hover:#d16a1c;
+  --accent-hover:#c75e12;
 
   --ok:          #3f7d58;
   --ok-bg:       #f1f8f3;
@@ -35,25 +38,26 @@
 
   --sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --headline: Georgia, Times, "Times New Roman", serif;
   --radius: 10px;
   --shadow: 0 1px 2px rgba(28, 26, 23, .05), 0 1px 3px rgba(28, 26, 23, .04);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ground:      #131211;
-    --surface:     #1a1917;
-    --surface-sunk:#211f1c;
-    --ink:         #ece8e2;
-    --ink-soft:    #a49b91;
-    --ink-faint:   #7a736b;
-    --rule:        #2f2c28;
-    --rule-soft:   #24221f;
+    --ground:      #131313;
+    --surface:     #201e1b;
+    --surface-sunk:#23201e;
+    --ink:         #f2ede5;
+    --ink-soft:    #a89e92;
+    --ink-faint:   #7d7469;
+    --rule:        #322d27;
+    --rule-soft:   #28241f;
 
-    --accent:      #f0913f;
-    --accent-bg:   #2a1e13;
+    --accent:      #f5a85c;
+    --accent-bg:   #2a1d12;
     --accent-solid:#e87722;
-    --accent-hover:#f0913f;
+    --accent-hover:#f5a85c;
 
     --ok:  #6fb98a; --ok-bg:  #16241b;
     --warn:#d9a441; --warn-bg:#26200f;
@@ -79,16 +83,40 @@ body { margin: 0; background: var(--ground); color: var(--ink); }
   padding: 22px 16px; display: flex; flex-direction: column; gap: 26px;
   position: sticky; top: 0; height: 100vh;
 }
+
+/* The site alternates near-black against cream. The sidebar takes the dark
+   half so the tool reads as Skayle 360 rather than as a generic dashboard.
+
+   These are token overrides, not component overrides: every child already
+   paints with var(--surface) / var(--ink) / var(--rule), so redefining them
+   on the container re-themes the whole sidebar and nothing can end up
+   rendering light text on light ground. It holds in dark mode too, where the
+   values are close to the ones the scheme already sets. */
+.side {
+  --surface:      #131313;
+  --surface-sunk: #201e1b;
+  --ink:          #f2ede5;
+  --ink-soft:     #a89e92;
+  --ink-faint:    #7d7469;
+  --rule:         #2e2a26;
+  --rule-soft:    #262220;
+  --accent:       #f5a85c;
+  --accent-bg:    rgba(232, 119, 34, .16);
+
+  background: var(--surface);
+  border-right-color: var(--rule);
+  color: var(--ink);
+}
 .brand { display: flex; flex-direction: column; gap: 1px; padding: 0 8px; }
-.brand b { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
-.brand span { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
-              text-transform: uppercase; color: var(--ink-faint); }
+.brand b { font-family: var(--headline); font-size: 17px; font-weight: 400; letter-spacing: -.3px; }
+.brand span { font-family: var(--mono); font-size: 10px; letter-spacing: 1.32px;
+              text-transform: uppercase; color: var(--accent); }
 
 .side nav { display: flex; flex-direction: column; gap: 2px; }
 .side nav button {
   display: flex; align-items: center; gap: 10px; width: 100%;
-  padding: 8px 10px; border: 0; border-radius: 7px; cursor: pointer;
-  background: none; color: var(--ink-soft); font: inherit; text-align: left;
+  padding: 8px 10px; border: 0; border-radius: 6px; cursor: pointer;
+  background: none; color: var(--ink-soft); font: inherit; font-weight: 500; text-align: left;
 }
 .side nav button:hover { background: var(--surface-sunk); color: var(--ink); }
 .side nav button.on { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
@@ -96,7 +124,7 @@ body { margin: 0; background: var(--ground); color: var(--ink); }
 
 .side footer { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
 .health { padding: 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface-sunk); }
-.health dt { font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+.health dt { font-family: var(--mono); font-size: 10px; letter-spacing: 1.32px;
              text-transform: uppercase; color: var(--ink-faint); margin-bottom: 5px; }
 .health dd { margin: 0; font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums;
              display: flex; justify-content: space-between; gap: 8px; }
@@ -106,7 +134,10 @@ body { margin: 0; background: var(--ground); color: var(--ink); }
 /* --------------------------------------------------------------------- main */
 .main { padding: 30px 34px 80px; max-width: 1000px; }
 .page-head { margin-bottom: 26px; }
-.page-head h1 { font-size: 21px; font-weight: 600; letter-spacing: -.015em; margin: 0 0 3px; }
+.page-head.with-action { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.page-head.with-action > button { flex-shrink: 0; }
+.page-head h1 { font-family: var(--headline); font-size: 25px; font-weight: 400;
+                letter-spacing: -.3px; margin: 0 0 4px; }
 .page-head p { margin: 0; color: var(--ink-soft); }
 
 .panel {
@@ -121,7 +152,7 @@ body { margin: 0; background: var(--ground); color: var(--ink); }
 
 /* ------------------------------------------------------------------ controls */
 button, .btn {
-  font: inherit; font-weight: 500; padding: 7px 14px; border-radius: 7px;
+  font: inherit; font-weight: 600; padding: 8px 15px; border-radius: 6px;
   cursor: pointer; border: 1px solid var(--accent-solid);
   background: var(--accent-solid); color: #fff; transition: background .12s;
 }
@@ -137,8 +168,8 @@ button.danger { background: var(--surface); color: var(--bad); border-color: var
 button.danger:hover:not(:disabled) { background: var(--bad-bg); border-color: var(--bad); }
 
 input, textarea {
-  font: inherit; width: 100%; padding: 8px 11px; color: var(--ink);
-  background: var(--surface); border: 1px solid var(--rule); border-radius: 7px;
+  font: inherit; width: 100%; padding: 9px 12px; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
 }
 textarea { font-family: var(--mono); font-size: 13px; line-height: 1.65; resize: vertical; }
 input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
@@ -175,9 +206,13 @@ label { font-weight: 500; font-size: 13.5px; }
   background: var(--rule); flex-shrink: 0;
 }
 .pipeline .bar { flex: 1; height: 1.5px; background: var(--rule); margin: 0 7px; }
-.pipeline li.done .dot { color: var(--ok); }
-.pipeline li.done .dot::before { background: var(--ok); }
-.pipeline li.done .bar { background: var(--ok); }
+/* Orange is "this happened", green is "answerable". Only the last stage
+   earns green, because only live means a visitor can be told about the file. */
+.pipeline li.done .dot { color: var(--accent); }
+.pipeline li.done .dot::before { background: var(--accent-solid); }
+.pipeline li.done .bar { background: var(--accent-solid); }
+.pipeline li.live .dot { color: var(--ok); font-weight: 500; }
+.pipeline li.live .dot::before { background: var(--ok); }
 .pipeline li.now .dot { color: var(--warn); font-weight: 500; }
 .pipeline li.now .dot::before { background: var(--warn); animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
@@ -191,12 +226,41 @@ label { font-weight: 500; font-size: 13.5px; }
 table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
 th, td { padding: 9px 18px; text-align: left; border-bottom: 1px solid var(--rule-soft); }
 th {
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1.05px; text-transform: uppercase;
   font-weight: 500; color: var(--ink-faint); background: var(--surface-sunk); white-space: nowrap;
 }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr:hover td { background: var(--surface-sunk); }
 .num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+.filters { display: flex; gap: 5px; flex-wrap: wrap; }
+.chip {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1.05px; text-transform: uppercase;
+  font-weight: 400; padding: 4px 9px; border-radius: 20px;
+  background: var(--surface); color: var(--ink-soft); border: 1px solid var(--rule);
+}
+.chip:hover:not(.on) { background: var(--surface-sunk); color: var(--ink); border-color: var(--ink-faint); }
+.chip.on { background: var(--accent-solid); border-color: var(--accent-solid); color: #fff; }
+
+/* The type column is read down the page rather than per row, so plain tracked
+   mono scans better than a column of pills. Only corrections earn the accent:
+   they are the one type that overrides everything else. */
+.type { font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint); }
+.type.accent { color: var(--accent); }
+.num .all { color: var(--ok); }
+
+.table-foot {
+  margin: 0; padding: 10px 18px 13px;
+  border-top: 1px solid var(--rule-soft);
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .6px;
+  color: var(--ink-faint);
+}
+.table-foot button.link { font-family: var(--mono); font-size: 10.5px; letter-spacing: .6px; }
+
+button.link.danger { background: none; border: 0; color: var(--bad); padding: 0; }
+button.link.danger:hover:not(:disabled) { background: none; border: 0; text-decoration: underline; }
 
 .tag {
   display: inline-block; font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
@@ -228,7 +292,8 @@ tbody tr:hover td { background: var(--surface-sunk); }
   border: 1px solid var(--rule); border-radius: 12px; padding: 26px;
   box-shadow: var(--shadow);
 }
-.login h1 { font-size: 17px; font-weight: 600; margin: 0 0 2px; }
+.login h1 { font-family: var(--headline); font-size: 21px; font-weight: 400;
+            letter-spacing: -.3px; margin: 0 0 3px; }
 .login .sub { margin: 0 0 20px; color: var(--ink-soft); font-size: 13.5px; }
 .login form { display: flex; flex-direction: column; gap: 8px; }
 .login button { margin-top: 4px; }
@@ -281,7 +346,8 @@ button.link.small { font-size: 13px; }
   .scrim, .dialog { animation: none; }
 }
 
-.dialog h2 { font-size: 15px; font-weight: 600; margin: 0 0 6px; letter-spacing: -.01em; }
+.dialog h2 { font-family: var(--headline); font-size: 18px; font-weight: 400;
+             margin: 0 0 7px; letter-spacing: -.3px; }
 .dialog p { margin: 0 0 18px; color: var(--ink-soft); font-size: 14px; line-height: 1.55; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
 

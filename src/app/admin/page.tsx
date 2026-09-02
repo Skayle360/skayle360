@@ -34,6 +34,12 @@ const ICON = {
   lock: "M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4",
 };
 
+
+/** A 40 KB file rendered as "0.0 MB" reads as an upload that failed. */
+function fileSize(bytes: number): string {
+  return bytes < 1e6 ? `${Math.max(1, Math.round(bytes / 1e3))} KB` : `${(bytes / 1e6).toFixed(1)} MB`;
+}
+
 export default function Admin() {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [tab, setTab] = useState<"documents" | "knowledge" | "prompts">("documents");
@@ -187,7 +193,13 @@ function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload, 
   confirm: (c: Confirming) => void;
 }) {
   const [dragging, setDragging] = useState(false);
+  const [filter, setFilter] = useState("all");
   const fileInput = useRef<HTMLInputElement>(null);
+
+  // Filter options come from what is actually indexed, so a source type nobody
+  // has uploaded never shows as an empty choice.
+  const types = [...new Set(docs.map((d) => d.source_type))].sort();
+  const shown = filter === "all" ? docs : docs.filter((d) => d.source_type === filter);
 
   /** Removing an indexed source also records it, so a re-ingest cannot restore it. */
   function removeDoc(d: Doc) {
@@ -266,9 +278,12 @@ function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload, 
 
   return (
     <>
-      <div className="page-head">
-        <h1>Documents</h1>
-        <p>What the assistant is allowed to answer from.</p>
+      <div className="page-head with-action">
+        <div>
+          <h1>Documents</h1>
+          <p>What the assistant is allowed to answer from.</p>
+        </div>
+        <button className="ghost" onClick={() => fileInput.current?.click()}>Add source</button>
       </div>
 
       <section className="panel">
@@ -298,7 +313,7 @@ function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload, 
               <article key={u.id} className="upload">
                 <div className="upload-head">
                   <b>{u.filename}</b>
-                  <span>{(u.size_bytes / 1e6).toFixed(1)} MB</span>
+                  <span>{fileSize(u.size_bytes)}</span>
                 </div>
                 {u.status === "failed"
                   ? <div className="note bad" style={{ marginTop: 10 }}><p>{u.error ?? "Failed"}</p></div>
@@ -354,8 +369,22 @@ function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload, 
 
       <section className="panel">
         <div className="panel-head" style={{ paddingBottom: 14 }}>
-          <h2>Indexed knowledge</h2>
-          <p>{docs.length} sources the assistant can cite.</p>
+          <div className="head-row">
+            <div>
+              <h2>Indexed knowledge</h2>
+              <p>{docs.length} sources the assistant can cite.</p>
+            </div>
+            {types.length > 1 && (
+              <div className="filters">
+                <button className={`chip${filter === "all" ? " on" : ""}`} onClick={() => setFilter("all")}>all</button>
+                {types.map((t) => (
+                  <button key={t} className={`chip${filter === t ? " on" : ""}`} onClick={() => setFilter(t)}>
+                    {t.replace(/_/g, " ")}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div className="scroll">
           <table>
@@ -363,25 +392,33 @@ function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload, 
               <tr><th>Source</th><th>Type</th><th className="num">Words</th><th className="num">Chunks</th><th className="num">Embedded</th><th /></tr>
             </thead>
             <tbody>
-              {docs.map((d) => (
+              {shown.map((d) => (
                 <tr key={d.doc_id}>
                   <td>{d.title}</td>
                   <td>
-                    <span className={`tag${d.source_type === "correction" ? " accent" : ""}`}>
+                    <span className={`type${d.source_type === "correction" ? " accent" : ""}`}>
                       {d.source_type.replace(/_/g, " ")}
                     </span>
                   </td>
                   <td className="num">{d.words.toLocaleString()}</td>
                   <td className="num">{d.chunks}</td>
-                  <td className="num">{d.embedded === d.chunks ? "all" : `${d.embedded}/${d.chunks}`}</td>
                   <td className="num">
-                    <button className="danger small" onClick={() => void removeDoc(d)}>Remove</button>
+                    {d.embedded === d.chunks
+                      ? <span className="all">all</span>
+                      : `${d.embedded}/${d.chunks}`}
+                  </td>
+                  <td className="num">
+                    <button className="link danger small" onClick={() => void removeDoc(d)}>Remove</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <p className="table-foot">
+          Showing {shown.length} of {docs.length} sources
+          {filter !== "all" && <> · <button className="link small" onClick={() => setFilter("all")}>clear filter</button></>}
+        </p>
       </section>
     </>
   );
@@ -389,10 +426,13 @@ function Documents({ uploads, docs, excluded, busy, setBusy, setNotice, reload, 
 
 function Pipeline({ status }: { status: string }) {
   const at = STAGES.indexOf(status as (typeof STAGES)[number]);
+  const last = STAGES.length - 1;
   return (
     <ol className="pipeline">
       {STAGES.map((s, i) => (
-        <li key={s} className={i < at ? "done" : i === at ? "now" : ""}>
+        // The track is one line, not five labels: orange as far as the file got,
+        // green only at live, which is the stage that actually means answerable.
+        <li key={s} className={i < at ? "done" : i === at ? (i === last ? "live" : "now") : ""}>
           <span className="dot">{s}</span>
           {i < STAGES.length - 1 && <span className="bar" />}
         </li>
