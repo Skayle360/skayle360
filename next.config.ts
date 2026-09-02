@@ -1,9 +1,16 @@
 import type { NextConfig } from "next";
+import { ALLOWED_ORIGINS } from "./config/app";
 
-const ALLOWED = (process.env.ALLOWED_ORIGINS ?? "https://skayle360.com,https://skayle360.webflow.io")
-  .split(",")
-  .map((s) => s.trim())
-  .filter(Boolean);
+/**
+ * The same list the API's CORS check uses. It was duplicated here with its own
+ * fallback, and the two drifted: origins added to config/app.ts were accepted
+ * by the API but still refused by frame-ancestors, so the widget's requests
+ * succeeded while the iframe itself was blocked.
+ *
+ * These headers are baked in at build time, so changing ALLOWED_ORIGINS in the
+ * hosting environment only takes effect on the next deploy.
+ */
+const ALLOWED = ALLOWED_ORIGINS;
 
 const config: NextConfig = {
   poweredByHeader: false,
