@@ -8,6 +8,18 @@ interface Upload {
   words: number | null; chunk_count: number | null; created_at: string;
   downloadable: boolean; display_name: string | null; download_count: number;
 }
+/**
+ * Chris's notes and Prompts are hidden from the admin.
+ *
+ * They are the client's own editing surface -- the notes block overrides every
+ * document, and the prompt blocks set tone and how hard the assistant asks for
+ * contact details. Hidden, the admin is upload-only.
+ *
+ * The components, the API routes and the version history are all untouched, so
+ * this is the only line that has to change to bring them back.
+ */
+const SHOW_EDITING_TABS = false;
+
 interface Doc {
   doc_id: string; title: string; source_type: string; words: number; chunks: number; embedded: number; origin: string;
 }
@@ -100,12 +112,16 @@ export default function Admin() {
           <button className={tab === "documents" ? "on" : ""} onClick={() => setTab("documents")}>
             <Icon d={ICON.docs} /> Documents
           </button>
-          <button className={tab === "knowledge" ? "on" : ""} onClick={() => setTab("knowledge")}>
-            <Icon d={ICON.note} /> Chris&rsquo;s notes
-          </button>
-          <button className={tab === "prompts" ? "on" : ""} onClick={() => setTab("prompts")}>
-            <Icon d={ICON.prompt} /> Prompts
-          </button>
+          {SHOW_EDITING_TABS && (
+            <>
+              <button className={tab === "knowledge" ? "on" : ""} onClick={() => setTab("knowledge")}>
+                <Icon d={ICON.note} /> Chris&rsquo;s notes
+              </button>
+              <button className={tab === "prompts" ? "on" : ""} onClick={() => setTab("prompts")}>
+                <Icon d={ICON.prompt} /> Prompts
+              </button>
+            </>
+          )}
         </nav>
         <footer>
           {totals && (
@@ -136,8 +152,8 @@ export default function Admin() {
           <Documents uploads={uploads} docs={docs} excluded={excluded} busy={busy} setBusy={setBusy}
                      setNotice={setNotice} reload={loadDocuments} confirm={setConfirming} />
         )}
-        {tab === "knowledge" && <Knowledge reload={loadDocuments} confirm={setConfirming} />}
-        {tab === "prompts" && <Prompts settings={settings} reload={loadSettings} confirm={setConfirming} />}
+        {SHOW_EDITING_TABS && tab === "knowledge" && <Knowledge reload={loadDocuments} confirm={setConfirming} />}
+        {SHOW_EDITING_TABS && tab === "prompts" && <Prompts settings={settings} reload={loadSettings} confirm={setConfirming} />}
       </main>
       <Confirm req={confirming} onClose={() => setConfirming(null)} />
     </div>
