@@ -9,16 +9,17 @@ interface Upload {
   downloadable: boolean; display_name: string | null; download_count: number;
 }
 /**
- * Chris's notes and Prompts are hidden from the admin.
+ * Prompts is hidden from the admin; Chris's notes is not.
  *
- * They are the client's own editing surface -- the notes block overrides every
- * document, and the prompt blocks set tone and how hard the assistant asks for
- * contact details. Hidden, the admin is upload-only.
+ * The prompt blocks set tone and how hard the assistant asks for contact
+ * details -- worth withholding until the client wants that control. The notes
+ * block is different: it is the one source that overrides every document, and
+ * it is how a wrong date gets corrected without re-uploading a PDF.
  *
- * The components, the API routes and the version history are all untouched, so
- * this is the only line that has to change to bring them back.
+ * The Prompts component, its API routes and its version history are untouched,
+ * so this is the only line that has to change to bring it back.
  */
-const SHOW_EDITING_TABS = false;
+const SHOW_PROMPTS_TAB = false;
 
 interface Doc {
   doc_id: string; title: string; source_type: string; words: number; chunks: number; embedded: number; origin: string;
@@ -112,15 +113,13 @@ export default function Admin() {
           <button className={tab === "documents" ? "on" : ""} onClick={() => setTab("documents")}>
             <Icon d={ICON.docs} /> Documents
           </button>
-          {SHOW_EDITING_TABS && (
-            <>
-              <button className={tab === "knowledge" ? "on" : ""} onClick={() => setTab("knowledge")}>
-                <Icon d={ICON.note} /> Chris&rsquo;s notes
-              </button>
-              <button className={tab === "prompts" ? "on" : ""} onClick={() => setTab("prompts")}>
-                <Icon d={ICON.prompt} /> Prompts
-              </button>
-            </>
+          <button className={tab === "knowledge" ? "on" : ""} onClick={() => setTab("knowledge")}>
+            <Icon d={ICON.note} /> Chris&rsquo;s notes
+          </button>
+          {SHOW_PROMPTS_TAB && (
+            <button className={tab === "prompts" ? "on" : ""} onClick={() => setTab("prompts")}>
+              <Icon d={ICON.prompt} /> Prompts
+            </button>
           )}
         </nav>
         <footer>
@@ -152,8 +151,8 @@ export default function Admin() {
           <Documents uploads={uploads} docs={docs} excluded={excluded} busy={busy} setBusy={setBusy}
                      setNotice={setNotice} reload={loadDocuments} confirm={setConfirming} />
         )}
-        {SHOW_EDITING_TABS && tab === "knowledge" && <Knowledge reload={loadDocuments} confirm={setConfirming} />}
-        {SHOW_EDITING_TABS && tab === "prompts" && <Prompts settings={settings} reload={loadSettings} confirm={setConfirming} />}
+        {tab === "knowledge" && <Knowledge reload={loadDocuments} confirm={setConfirming} />}
+        {SHOW_PROMPTS_TAB && tab === "prompts" && <Prompts settings={settings} reload={loadSettings} confirm={setConfirming} />}
       </main>
       <Confirm req={confirming} onClose={() => setConfirming(null)} />
     </div>
